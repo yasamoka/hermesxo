@@ -1,4 +1,19 @@
 {% extends 'layout.html' %}
 {% block content %}
     <h1> Something! </h1>
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Room</span>
+        </div>
+        <input type="number" id="room_id" min=1 max=100 value=1>
+        <div class="input-group-append">
+            <button class="btn btn-success" id="join">Join</button>
+        </div>
+    </div>
+    <script>
+    document.getElementById("join").onclick = function() {
+        var room_id_input = document.getElementById("room_id");
+        window.location.replace(`room/${room_id_input.value}`);
+    };
+    </script>
 {% endblock content %}

@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
-from hermesxo import app, db, bcrypt
+from flask_socketio import emit, join_room, leave_room, rooms
+from hermesxo import app, socketio, db, bcrypt
 from hermesxo.forms import RegistrationForm, LoginForm
 from hermesxo.models import User
 
@@ -10,7 +11,6 @@ from flask_login import login_user, current_user, logout_user, login_required
 @app.route("/home")
 def home():
     return render_template('home.html', title='Home')
-
 
 @app.route("/about")
 def about():
@@ -75,3 +75,26 @@ def logout():
 def account():
     return render_template('account.html',
                            title='Account')
+
+@app.route("/room/<int:id>",
+           methods=['GET'])
+@login_required
+def room(id):
+    return render_template('room.html',
+                           room_id=id)
+
+@socketio.on("join", namespace="/chatroom")
+def on_join(data):
+    if current_user.is_authenticated:
+        room = data["id"]
+        join_room(room)
+        emit("joined", {"username": current_user.username},
+             room=room, include_self=False)
+
+@socketio.on("leave", namespace="/chatroom")
+def on_leave(data):
+    if current_user.is_authenticated:
+        room = data["id"]
+        leave_room(room)
+        emit("left", {"username": current_user.username},
+             room=room, include_self=False)

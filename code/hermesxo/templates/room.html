@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>Room {{ room_id }}</h1>
+    <button class="btn btn-lg btn-danger" id="leave">Leave</button>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        var namespace = "/chatroom";
+        var socket = io(namespace);
+        socket.on('connect', function() {
+            socket.emit('join', {% raw %}{{% endraw %}id: {{ room_id }}{% raw %}}{% endraw %});
+        });
+        socket.on('joined', function(msg, cb) {
+            alert(`${msg.username} has joined!`);
+        });
+        socket.on('left', function(msg, cb) {
+            alert(`${msg.username} has left!`);
+        });
+        document.getElementById("leave").onclick = function() {
+            socket.emit('leave', {% raw %}{{% endraw %}id: {{ room_id }}{% raw %}}{% endraw %});
+            window.location.replace("/home");
+        };
+    </script>
+{% endblock content %}
